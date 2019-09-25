@@ -1,7 +1,7 @@
 ##########################################
 # Arduino Load Sensor Serial Monitor v.4 #
 # Author: Ryan Cummings                  #
-# Time-stamp: <2019-09-25 10:50:45 kubo> #
+# Time-stamp: <2019-09-25 14:20:22 kubo> #
 ##########################################
 
 #************************************************
@@ -427,39 +427,6 @@ class Window(QMainWindow):
         self.ax.set_ylabel('Force')
         self.ax.set_title(f'{filename}')
         self.canvas.draw()
-
-# class PlotCanvas(FigureCanvas):
-#     def __init__(self, parent=None, width=5, height=3, dpi=100):
-#         fig = Figure(figsize=(width, height), dpi=dpi)
-#         self.axes = fig.add_subplot(111)
-
-#         FigureCanvas.__init__(self, fig)
-#         self.setParent(parent)
-
-#         FigureCanvas.setSizePolicy(self,
-#                                    QSizePolicy.Expanding,
-#                                    QSizePolicy.Expanding)
-#         FigureCanvas.updateGeometry(self)
-#         self.plot()
-
-#     def plot(self):
-#         filename = self.name_textbox.text() + '.csv'
-#         base_dir = self.output_folder_textbox.text()
-#         filename = os.path.join(base_dir, filename)
-
-#         x = []
-#         with open(filename, 'r') as csvFile:
-#             reader = csv.reader(csvFile)
-#             for row in reader:
-#                 x.append(float(row[0]))
-
-        
-#         data = x
-#         ax = self.figure.add_subplot(111)
-#         ax.plot(data, 'r-')
-#         ax.set_title(f'{filename}')
-#         self.draw()
-
 
 def run():
     app = QApplication(sys.argv)
