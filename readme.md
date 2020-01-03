@@ -1,7 +1,7 @@
 # Introduction
-This GUI was written in PyQt5 for use with an arduino, load sensor, and HX711 load cell amplifier. The arduino code is also included. 
+This GUI was written in PyQt5 for use with an arduino, load sensor, and HX711 load cell amplifier. The arduino code is also included.
 
-# Hardware Requirements
+# Hardware
 - https://www.sparkfun.com/products/13879
 - https://www.sparkfun.com/products/13329
 
