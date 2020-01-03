@@ -15,12 +15,12 @@ from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
 #************************************************
 import sys
-from os.path import expanduser
 import glob
 import serial #from the PySerial library (pip install pyserial)
 import csv
 import time
 import random
+import os
 #************************************************
 import numpy as np
 from statistics import mean, stdev
@@ -50,7 +50,7 @@ class Window(QMainWindow):
         self.mainVertLayout = QVBoxLayout(self.centralwidget)
         self.horizontalLayout = QHBoxLayout()
         self.mainVertLayout.addLayout(self.horizontalLayout)
-        
+
         #Set up left and right groupboxes
         self.leftGroupBox = QGroupBox("Input Settings")
         self.horizontalLayout.addWidget(self.leftGroupBox)
@@ -105,7 +105,7 @@ class Window(QMainWindow):
 
         self.output_folder_textbox = QLineEdit(self)
         self.output_layout.addWidget(self.output_folder_textbox)
-        self.output_folder_textbox.setText(expanduser("~"))
+        self.output_folder_textbox.setText(os.path.expanduser("~"))
 
         self.output_box.setLayout(self.output_layout)
         self.left_vertical_layout.addWidget(self.output_box)
@@ -132,21 +132,21 @@ class Window(QMainWindow):
         self.serial_waste_textbox.setText("50")
         self.serial_waste_layout.addWidget(self.serial_waste_label)
         self.serial_waste_layout.addWidget(self.serial_waste_textbox)
-        
+
         self.plot_length_layout = QHBoxLayout()
         self.plot_length_label = QLabel("How many values to plot (low = fast):")
         self.plot_length_textbox = QLineEdit(self)
         self.plot_length_textbox.setText("40")
         self.plot_length_layout.addWidget(self.plot_length_label)
         self.plot_length_layout.addWidget(self.plot_length_textbox)
-        
+
         self.plot_steps_layout = QHBoxLayout()
         self.plot_steps_label = QLabel("Plot every [n] new values (high=fast):")
         self.plot_steps_textbox = QLineEdit(self)
         self.plot_steps_textbox.setText("1")
         self.plot_steps_layout.addWidget(self.plot_steps_label)
         self.plot_steps_layout.addWidget(self.plot_steps_textbox)
-        
+
         self.invert_checkbox = QCheckBox("Invert values")
 
         self.peak_int_layout = QHBoxLayout()
@@ -155,7 +155,7 @@ class Window(QMainWindow):
         self.peak_int_text.setText("10")
         self.peak_int_layout.addWidget(self.peak_int_label)
         self.peak_int_layout.addWidget(self.peak_int_text)
-        
+
         self.settings_layout.addLayout(self.serial_waste_layout)
         self.settings_layout.addLayout(self.plot_length_layout)
         self.settings_layout.addLayout(self.plot_steps_layout)
@@ -175,7 +175,7 @@ class Window(QMainWindow):
 
         # Add some filler space
         self.left_vertical_layout.addStretch()
-        
+
         # Set up stop and go buttons
         self.go_stop_layout = QHBoxLayout()
         self.go_btn = QPushButton("Go")
@@ -192,7 +192,7 @@ class Window(QMainWindow):
         self.progress = QProgressBar(self)
         self.progress.setValue(0)
         self.left_vertical_layout.addWidget(self.progress)
-        
+
         # Add some helpful text about serial delay
         self.go_stop_label = QLabel()
         self.go_stop_label.setText("Note: Program will wait for serial to stabilize before beginning to record data. Start suturing when progress bar is finished and plotter begins to plot new values.")
@@ -205,13 +205,13 @@ class Window(QMainWindow):
         self.analyze_btn.clicked.connect(self.analyze_data)
         self.analyze_btn.setEnabled(False)
         self.analyze_layout.addWidget(self.analyze_btn)
-        
+
         # Set up save and discard buttons
         self.discard_btn = QPushButton("Discard")
         self.discard_btn.clicked.connect(self.discard_file)
         self.analyze_layout.addWidget(self.discard_btn)
         self.right_vertical_layout.addLayout(self.analyze_layout)
-                
+
     def set_menubar(self):
         # Main Menu Setup
         extractAction = QAction("&Quit", self)
@@ -236,7 +236,7 @@ class Window(QMainWindow):
         filename = self.name_textbox.text() + '.csv'
         base_dir = self.output_folder_textbox.text()
         return os.path.join(base_dir, filename)
-        
+
     def plot(self, x, y):
         # Plots x and y for live plots
         filename = self.get_filename()
@@ -249,9 +249,9 @@ class Window(QMainWindow):
         self.ax.set_title(f'{filename}')
         self.ax.set_xlabel('Time (s)')
         self.ax.set_ylabel('Force')
-        
+
         self.canvas.draw()
-    
+
     def open_folder(self):
         # Dialog to select an output directory
         file = str(QFileDialog.getExistingDirectory(self, "Select Directory"))
@@ -271,7 +271,7 @@ class Window(QMainWindow):
         serial_delay_waste = int(self.serial_waste_textbox.text())
         plot_max_length = int(self.plot_length_textbox.text())
         plot_steps = int(self.plot_steps_textbox.text())
-        
+
         self.clear_plot()
         self.canvas.draw()
         self.ax = self.canvas.figure.add_subplot(111)
@@ -321,9 +321,8 @@ class Window(QMainWindow):
                             else:
                                 self.plot(self.x, self.y)
         except:
-            print(arg)
             sys.exit()
-                
+
     def stop_trial(self):
         if self.running == False:
             return
@@ -335,7 +334,7 @@ class Window(QMainWindow):
                                 quoting=csv.QUOTE_MINIMAL,
                                 lineterminator = '\n')
 
-        
+
             for x, y in zip(self.x, self.y):
                 writer.writerow((str(x), str(y)))
 
@@ -359,7 +358,7 @@ class Window(QMainWindow):
             os.remove(summary_name)
         except:
             pass
-        
+
         self.analyze_btn.setEnabled(False)
         self.discard_btn.setEnabled(False)
         self.clear_plot()
@@ -370,7 +369,7 @@ class Window(QMainWindow):
             self.ax.remove()
         except:
             pass
-        
+
     def analyze_data(self):
         local_peak_interval = int(self.peak_int_text.text())
         filename = self.get_filename()
@@ -394,14 +393,14 @@ class Window(QMainWindow):
         stats['Min force'] = min(y)
         stats['Avg force'] = mean(y)
         stats['Std Dev force'] = stdev(y)
-        
+
         peak_index, _ = find_peaks(y, distance=local_peak_interval, height=1)
         peaks_x = []
         peaks_y = []
         if len(peak_index) == 0:
             msg = QMessageBox("No peaks found; aborting...")
             return
-        
+
         for peak in peak_index:
             peaks_x.append(x[peak])
             peaks_y.append(y[peak])
